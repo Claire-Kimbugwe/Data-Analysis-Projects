@@ -1,0 +1,146 @@
+---
+title: "Data Collection"
+author: " By Claire M.K "
+date: "September 19, 2017"
+output: html_document
+---
+
+
+## The American Community Survey distributes downloadable data about United States communities. Download the 2006 microdata survey about housing for the state of Idaho using download.file() from here:
+
+https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Fss06hid.csv
+
+and load the data into R. The code book, describing the variable names is here:
+
+https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2FPUMSDataDict06.pdf
+
+
+
+```{r setup, include=FALSE , warning=FALSE}
+#Get data From URL
+asUrl <- "https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Fss06hid.csv"
+download.file(asUrl, destfile ="asfile.csv" )
+asdata <- read.csv("asfile.csv")
+
+```
+
+
+## How many properties are worth $1,000,000 or more?
+
+
+```{r warning=FALSE}
+#Subset the data, save int variable Qn1.
+Qn1 <- subset(asdata, VAL == 24)
+nrow(Qn1)
+```
+
+
+
+## Download the Excel spreadsheet on Natural Gas Aquisition Program here:
+
+https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2FDATA.gov_NGAP.xlsx
+
+Read rows 18-23 and columns 7-15 into R and assign the result to a variable called:
+dat
+
+```{r  echo=FALSE, Warning = FALSE}
+# install package XLsx first, load the library 
+library(xlsx)
+library(xlsxjars)
+#getin data from web
+excurl = "https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2FDATA.gov_NGAP.xlsx"
+#creating the file
+urlf = file.path(getwd(),"DATA.gov_NGAP.xlsx")
+download.file(excurl, urlf, mode = "wb") # download the file
+dat <- read.xlsx(urlf, 1, rowIndex = 18:23, colIndex = 7:15 ) #read file into a dataframe
+
+```
+
+
+## What is the Value of
+
+sum(dat$Zip*dat$Ext,na.rm=T)
+
+
+```{r Warning = FALSE}
+sum(dat$Zip * dat$Ext, na.rm = T)
+
+```
+
+
+## Read the XML data on Baltimore restaurants from here:
+
+https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Frestaurants.xml
+
+
+```{r warning=FALSE}
+library(XML)
+xmlurl <- "http://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Frestaurants.xml"
+docu <- xmlTreeParse(xmlurl, useInternalNodes = TRUE)
+RootNode <- xmlRoot(docu)
+DocuName <- RootNode
+```
+
+
+## How many restaurants have zipcode 21231?
+
+```{r warning=FALSE}
+zipcode <- xpathSApply(RootNode, "//zipcode", xmlValue)
+length(zipcode[zipcode==21231])
+```
+
+
+## The American Community Survey distributes downloadable data about United States communities. Download the 2006 microdata survey about housing for the state of Idaho using download.file() from here:
+
+https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Fss06pid.csv
+
+
+```{r}
+pidurl <- "https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Fss06pid.csv"
+pid <- download.file(pidurl, destfile = "piddata.csv")
+piddata <- read.csv("piddata.csv")
+```
+
+## Using the fread() command load the data into an R object DT
+```{r warning=FALSE }
+library(data.table)
+DT <-fread(input = "https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Fss06pid.csv" ,
+           sep = ",")
+
+```
+
+
+## Which is the fastest way to calculate the average value of the variable pwgtp15 broken down by sex using the data.table package?
+
+
+```{r}
+system.time(sapply(split(DT$pwgtp15,DT$SEX),mean))     
+
+```
+
+```{r}
+system.time(mean(DT[DT$SEX==1,]$pwgtp15): mean(DT[DT$SEX==2,]$pwgtp15))
+```
+
+
+```{r}
+system.time(mean(DT$pwgtp15,by=DT$SEX))
+```
+
+
+```{r}
+system.time(DT[,mean(pwgtp15),by=SEX])
+```
+```{r}
+system.time(tapply(DT$pwgtp15,DT$SEX,mean))
+```
+
+# END
+
+
+
+
+
+
+
+
